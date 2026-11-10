@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Circle · Know who has paid</title>
+<style>
+  :root{
+    --bg:#f6f4ef; --card:#fff; --ink:#1b1f23; --muted:#555d66; --line:#d9d5cb;
+    --green:#0d6b3c; --green-bg:#e3f3ea; --amber:#8a4b00; --amber-bg:#fff0d6;
+    --blue:#12385f; --blue-bg:#e4edf8;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --bg:#14171a; --card:#1e2327; --ink:#f2f2ef; --muted:#aab2ba; --line:#39414a;
+      --green:#6fd39c; --green-bg:#16301f; --amber:#ffc46b; --amber-bg:#3a2a10;
+      --blue:#a9cdf5; --blue-bg:#182a40;
+    }
+  }
+  *{box-sizing:border-box}
+  html{font-size:20px}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;line-height:1.4}
+  main{max-width:34rem;margin:0 auto;padding:.75rem .9rem 3rem}
+  .proto{font-size:.8rem;background:var(--amber-bg);color:var(--amber);
+    padding:.5rem .7rem;border-radius:.5rem;margin-bottom:1rem;font-weight:600}
+  .brand{font-size:1rem;font-weight:700;color:var(--muted);letter-spacing:.02em;margin-bottom:.4rem}
+  h1{font-size:2rem;line-height:1.15;margin:.2rem 0 .7rem;font-weight:800}
+  h2{font-size:1.25rem;margin:2rem 0 .6rem}
+  p{margin:.4rem 0}
+  .lead{font-size:1.1rem;color:var(--muted)}
+  .card{background:var(--card);border:2px solid var(--line);border-radius:1rem;padding:1rem;margin-bottom:.8rem}
+  .step{display:flex;gap:.8rem;align-items:flex-start}
+  .num{flex:none;width:2.4rem;height:2.4rem;border-radius:50%;background:var(--blue-bg);
+    color:var(--blue);font-weight:800;font-size:1.2rem;display:flex;align-items:center;justify-content:center}
+  .step b{display:block;font-size:1.1rem}
+  .step span{color:var(--muted);font-size:1rem}
+  .btn{display:block;width:100%;text-align:center;text-decoration:none;font:inherit;font-weight:700;
+    font-size:1.1rem;border-radius:.8rem;border:2px solid var(--green);min-height:3.4rem;
+    padding:.8rem 1rem;margin-top:.7rem;cursor:pointer}
+  .primary{background:var(--green);color:#fff}
+  @media (prefers-color-scheme:dark){.primary{color:#06210f}}
+  .secondary{background:transparent;color:var(--green)}
+  .btn:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+  .note{background:var(--blue-bg);border-color:var(--blue);color:var(--ink)}
+  .note b{color:var(--blue)}
+  .msg{margin-top:.5rem;color:var(--amber);font-weight:600;font-size:.95rem}
+  footer{margin-top:2rem;font-size:.85rem;background:var(--amber-bg);color:var(--amber);
+    padding:.7rem .8rem;border-radius:.5rem;font-weight:600}
+</style>
+</head>
+<body>
+<main>
+  <div class="proto">Prototype. All names and payments are invented. No real money moves.</div>
+  <div class="brand">CIRCLE</div>
+
+  <h1>Stop chasing payments in the WhatsApp group.</h1>
+  <p class="lead">Running a savings circle should not mean a notebook, scrolling messages and awkward reminders. Circle shows who has paid this month and whose turn is next, right at the top.</p>
+
+  <a class="btn primary" href="app.html">Try the prototype</a>
+
+  <h2>How it works</h2>
+  <div class="card step"><div class="num">1</div>
+    <div><b>Set up your circle</b><span>Your members, the monthly amount and the order of turns.</span></div></div>
+  <div class="card step"><div class="num">2</div>
+    <div><b>Mark each payment</b><span>When someone pays you, tap one button. The screen updates straight away.</span></div></div>
+  <div class="card step"><div class="num">3</div>
+    <div><b>See it at a glance</b><span>Who has paid, who is still to pay, and who gets the pot this month.</span></div></div>
+
+  <div class="card note">
+    <p><b>What this prototype does today</b></p>
+    <p>It works on one phone with ten invented members. You can mark payments and watch the screen change.</p>
+    <p><b>What it does not do yet</b></p>
+    <p>It does not share the screen with the rest of your circle, send reminders, or handle money. The organiser still collects payments as they do now.</p>
+  </div>
+
+  <h2>Tell us what you think</h2>
+  <p>We are speaking to people who run savings circles before we build more. It takes one minute.</p>
+  <a class="btn secondary" id="cta" href="#" target="_blank" rel="noopener">Join the waiting list or give feedback</a>
+  <div class="msg" id="msg" role="status"></div>
+
+  <footer>This is a prototype with invented data. The names, amounts and payments are made up. Nothing here is a real circle.</footer>
+</main>
+
+<script>
+  // Paste your form's share link between the quotes:
+  var FORM_URL = "PASTE YOUR FORM LINK HERE";
+
+  var cta = document.getElementById("cta");
+  var msg = document.getElementById("msg");
+  if (/^https?:\/\//.test(FORM_URL)) {
+    cta.href = FORM_URL;
+  } else {
+    cta.addEventListener("click", function(e){
+      e.preventDefault();
+      msg.textContent = "Form link not added yet. Paste it into FORM_URL in this file.";
+    });
+  }
+</script>
+</body>
+</html>
