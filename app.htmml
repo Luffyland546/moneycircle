@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Circle · November</title>
+<style>
+  :root{
+    --bg:#f6f4ef; --card:#fff; --ink:#1b1f23; --muted:#555d66; --line:#d9d5cb;
+    --green:#0d6b3c; --green-bg:#e3f3ea; --amber:#8a4b00; --amber-bg:#fff0d6;
+    --blue:#12385f; --blue-bg:#e4edf8;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --bg:#14171a; --card:#1e2327; --ink:#f2f2ef; --muted:#aab2ba; --line:#39414a;
+      --green:#6fd39c; --green-bg:#16301f; --amber:#ffc46b; --amber-bg:#3a2a10;
+      --blue:#a9cdf5; --blue-bg:#182a40;
+    }
+  }
+  *{box-sizing:border-box}
+  html{font-size:20px}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;line-height:1.35}
+  main{max-width:34rem;margin:0 auto;padding:.75rem .9rem 3rem}
+  .proto{font-size:.8rem;background:var(--amber-bg);color:var(--amber);
+    padding:.5rem .7rem;border-radius:.5rem;margin-bottom:.75rem;font-weight:600}
+  h1{font-size:1rem;margin:.2rem 0 .6rem;color:var(--muted);font-weight:600;letter-spacing:.02em}
+  h2{font-size:1.15rem;margin:1.6rem 0 .5rem}
+  .card{background:var(--card);border:2px solid var(--line);border-radius:1rem;padding:1rem;margin-bottom:.8rem}
+  .label{font-size:.85rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+  .big{font-size:2rem;font-weight:800;line-height:1.1;margin:.15rem 0}
+  .sub{font-size:1rem;color:var(--muted)}
+  .turn .big{color:var(--blue)}
+  .next{margin-top:.6rem;padding-top:.6rem;border-top:1px solid var(--line);font-size:1rem}
+  .count{font-size:2.4rem;font-weight:800;line-height:1}
+  .bar{height:1.1rem;background:var(--line);border-radius:1rem;overflow:hidden;margin:.7rem 0 .4rem}
+  .bar i{display:block;height:100%;background:var(--green);transition:width .35s}
+  .done{background:var(--green-bg);color:var(--green);border-color:var(--green);
+    font-weight:700;font-size:1.05rem}
+  .row{display:flex;align-items:center;justify-content:space-between;gap:.6rem;
+    background:var(--card);border:2px solid var(--line);border-radius:.8rem;
+    padding:.7rem .8rem;margin-bottom:.5rem}
+  .row .name{font-size:1.1rem;font-weight:700}
+  .row .meta{font-size:.85rem;color:var(--muted)}
+  .row.paid{border-color:var(--green)}
+  .tag{font-size:.85rem;font-weight:700;padding:.15rem .5rem;border-radius:.4rem;display:inline-block;margin-top:.15rem}
+  .tag.ok{background:var(--green-bg);color:var(--green)}
+  .tag.wait{background:var(--amber-bg);color:var(--amber)}
+  button{font:inherit;font-weight:700;border-radius:.7rem;border:2px solid var(--green);
+    min-height:3rem;padding:.5rem .9rem;cursor:pointer}
+  .mark{background:var(--green);color:#fff;border-color:var(--green)}
+  @media (prefers-color-scheme:dark){.mark{color:#06210f}}
+  .undo{background:transparent;color:var(--muted);border-color:var(--line);font-size:.85rem;min-height:2.6rem}
+  button:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+  .order{list-style:none;padding:0;margin:0}
+  .order li{display:flex;justify-content:space-between;gap:.5rem;padding:.6rem .2rem;
+    border-bottom:1px solid var(--line);font-size:1rem}
+  .order li.now{font-weight:800;color:var(--blue);background:var(--blue-bg);
+    border-radius:.5rem;padding-left:.6rem;padding-right:.6rem}
+  .order li.past{color:var(--muted)}
+  .reset{margin-top:1.5rem;width:100%;background:transparent;color:var(--muted);border-color:var(--line)}
+  .empty{color:var(--muted);padding:.4rem .2rem}
+</style>
+</head>
+<body>
+<main>
+  <div class="proto">Prototype. All names and payments are invented. No real money moves.</div>
+  <h1>BLANCHARDSTOWN CIRCLE · <span id="month"></span></h1>
+
+  <section class="card turn" aria-live="polite">
+    <div class="label">This month the pot goes to</div>
+    <div class="big" id="winner"></div>
+    <div class="sub" id="potline"></div>
+    <div class="next">Next month: <b id="nextwho"></b></div>
+  </section>
+
+  <section class="card" aria-live="polite">
+    <div class="label">Who has paid</div>
+    <div class="count"><span id="paidN"></span> of 10 paid</div>
+    <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="10" id="bar"><i id="fill"></i></div>
+    <div class="sub" id="money"></div>
+  </section>
+
+  <div id="banner"></div>
+
+  <h2>Still to pay (<span id="waitN"></span>)</h2>
+  <div id="waiting"></div>
+
+  <h2>Paid (<span id="paidN2"></span>)</h2>
+  <div id="paid"></div>
+
+  <h2>Order of turns</h2>
+  <ol class="order" id="order"></ol>
+
+  <button class="reset" id="reset">Reset sample data</button>
+</main>
+
+<script>
+  // ---- Invented sample data ----
+  var AMOUNT = 100;
+  var MONTH_NAME = "November";
+  var members = [
+    { id:1,  name:"Priya Nair",       turn:"August",   paid:"2 Nov" },
+    { id:2,  name:"Sean Byrne",       turn:"September",paid:"1 Nov" },
+    { id:3,  name:"Fatima Khan",      turn:"October",  paid:"3 Nov" },
+    { id:4,  name:"Aoife Brennan",    turn:"November", paid:"1 Nov" },
+    { id:5,  name:"Tomasz Nowak",     turn:"December", paid:"4 Nov" },
+    { id:6,  name:"Chidinma Eze",     turn:"January",  paid:null },
+    { id:7,  name:"Mairéad Doyle",    turn:"February", paid:"5 Nov" },
+    { id:8,  name:"Liam Gallagher",   turn:"March",    paid:"2 Nov" },
+    { id:9,  name:"Ana Silva",        turn:"April",    paid:null },
+    { id:10, name:"Kwame Mensah",     turn:"May",      paid:null }
+  ];
+  var CURRENT = 3; // index of this month's receiver (Aoife)
+  var original = JSON.parse(JSON.stringify(members));
+
+  function $(id){ return document.getElementById(id); }
+  function euro(n){ return "€" + n.toLocaleString("en-IE"); }
+  function todayLabel(){
+    var d = new Date();
+    return d.getDate() + " " + d.toLocaleString("en-IE",{month:"short"});
+  }
+
+  function rowHtml(m, isPaid){
+    var tag = isPaid
+      ? '<span class="tag ok">✓ Paid ' + m.paid + '</span>'
+      : '<span class="tag wait">Waiting for ' + euro(AMOUNT) + '</span>';
+    var btn = isPaid
+      ? '<button class="undo" data-undo="' + m.id + '" aria-label="Undo payment for ' + m.name + '">Undo</button>'
+      : '<button class="mark" data-mark="' + m.id + '" aria-label="Mark ' + m.name + ' as paid">Mark paid</button>';
+    return '<div class="row' + (isPaid ? ' paid' : '') + '"><div><div class="name">' + m.name +
+      (m.id === members[CURRENT].id ? ' <span class="meta">(gets the pot)</span>' : '') +
+      '</div>' + tag + '</div>' + btn + '</div>';
+  }
+
+  function render(){
+    var paid = members.filter(function(m){ return m.paid; });
+    var waiting = members.filter(function(m){ return !m.paid; });
+    var n = paid.length, total = n * AMOUNT, pot = members.length * AMOUNT;
+    var winner = members[CURRENT];
+    var next = members[(CURRENT + 1) % members.length];
+
+    $("month").textContent = MONTH_NAME.toUpperCase();
+    $("winner").textContent = winner.name;
+    $("potline").textContent = euro(pot) + " pot · " + winner.turn + " turn";
+    $("nextwho").textContent = next.name + " (" + next.turn + ")";
+
+    $("paidN").textContent = n;
+    $("paidN2").textContent = n;
+    $("waitN").textContent = waiting.length;
+    $("fill").style.width = (n * 10) + "%";
+    $("bar").setAttribute("aria-valuenow", n);
+    $("money").textContent = euro(total) + " of " + euro(pot) + " in" +
+      (waiting.length ? " · " + euro(pot - total) + " still to come" : "");
+
+    $("banner").innerHTML = waiting.length === 0
+      ? '<div class="card done">✓ Everyone has paid. ' + winner.name + ' can collect ' + euro(pot) + '.</div>'
+      : '';
+
+    $("waiting").innerHTML = waiting.length
+      ? waiting.map(function(m){ return rowHtml(m,false); }).join("")
+      : '<div class="empty">Nobody. All paid.</div>';
+    $("paid").innerHTML = paid.length
+      ? paid.map(function(m){ return rowHtml(m,true); }).join("")
+      : '<div class="empty">Nobody has paid yet.</div>';
+
+    $("order").innerHTML = members.map(function(m,i){
+      var cls = i < CURRENT ? "past" : (i === CURRENT ? "now" : "");
+      var note = i < CURRENT ? "Got the pot" : (i === CURRENT ? "This month" : "");
+      return '<li class="' + cls + '"><span>' + (i+1) + '. ' + m.name + '</span><span>' +
+        m.turn + (note ? ' · ' + note : '') + '</span></li>';
+    }).join("");
+  }
+
+  document.addEventListener("click", function(e){
+    var t = e.target;
+    var mark = t.getAttribute && t.getAttribute("data-mark");
+    var undo = t.getAttribute && t.getAttribute("data-undo");
+    if (mark){
+      members.forEach(function(m){ if (m.id == mark) m.paid = todayLabel(); });
+      render();
+    } else if (undo){
+      members.forEach(function(m){ if (m.id == undo) m.paid = null; });
+      render();
+    }
+  });
+
+  $("reset").addEventListener("click", function(){
+    members = JSON.parse(JSON.stringify(original));
+    render();
+  });
+
+  render();
+</script>
+</body>
+</html>
